@@ -1,4 +1,9 @@
-# Cours Three.js - Leonard de Vinci 
+# Portfolio 2023 
+
+Made width 🍔 by Paul Maréchal
+
+ - Three.js 
+ - Available in VR mode
 
 ## Setup
 Download [Node.js](https://nodejs.org/en/download/).
