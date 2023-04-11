@@ -385,6 +385,10 @@ function onWindowResize() {
 ////////////
 // Annimate
 ////////////
+const clock = new THREE.Clock()
+
+let previousTime = 0
+
 function loop() {
 
 	// Don't forget, ThreeMeshUI must be updated manually.
@@ -392,7 +396,15 @@ function loop() {
 	// to improve performance
 	ThreeMeshUI.update();
 
-	tick()
+	// tick()
+	const elapsedTime = clock.getElapsedTime()
+
+	const deltaTime = elapsedTime - previousTime
+    previousTime = elapsedTime
+    // Update mixer
+    if(mixerPaul !== null){
+        mixerPaul.update(deltaTime)
+    }
 
 	controls.update();
 
@@ -402,25 +414,6 @@ function loop() {
 	renderer.render( scene, camera );
 
 	updateButtons();
-
-}
-
-const clock = new THREE.Clock()
-
-let previousTime = 0
-
-const tick = () => {
-
-    const elapsedTime = clock.getElapsedTime()
-
-	const deltaTime = elapsedTime - previousTime
-    previousTime = elapsedTime
-    // Update mixer
-    if(mixerPaul !== null){
-        mixerPaul.update(deltaTime)
-    }
-
-    window.requestAnimationFrame(tick)
 
 }
 
