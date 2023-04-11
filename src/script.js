@@ -5,6 +5,7 @@ import { BoxLineGeometry } from 'three/examples/jsm/geometries/BoxLineGeometry.j
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { AnimationClip, AnimationMixer } from "three";
 
 import ThreeMeshUI from 'three-mesh-ui';
 import VRControl from 'three-mesh-ui/examples/utils/VRControl.js';
@@ -170,15 +171,13 @@ function init() {
 	meshes = [ sphere, box, cone ];
 	currentMesh = 0;
 
-	showMesh( currentMesh );
+	// showMesh( currentMesh );
 
 	//////////
 	// Panel
 	//////////
 
 	makePanel();
-
-	//
 
 	renderer.setAnimationLoop( loop );
 
@@ -195,6 +194,62 @@ function showMesh( id ) {
 	} );
 
 }
+
+//////////
+	// Personnage
+	//////////
+	let mixerPaul = null
+
+	// Instantiate a loader
+	const loader = new GLTFLoader();
+
+	// Optional: Provide a DRACOLoader instance to decode compressed mesh data
+	const dracoLoader = new DRACOLoader();
+	dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
+	loader.setDRACOLoader( dracoLoader );
+
+	// Load a glTF resource
+	loader.load(
+		// resource URL
+		'https://paulmarechal.xyz/test/paul_waiting.glb',
+		// called when the resource is loaded
+		function ( gltf ) {
+
+			scene.add( gltf.scene );
+
+			gltf.animations; // Array<THREE.AnimationClip>
+			gltf.scene; // THREE.Group
+			gltf.scenes; // Array<THREE.Group>
+			gltf.cameras; // Array<THREE.Camera>
+			gltf.asset; // Object
+
+			gltf.scene.scale.set(0.9, 0.9, 0.9)
+			gltf.scene.position.set( 0, 0, -1.9 );
+
+			mixerPaul = new THREE.AnimationMixer(gltf.scene)
+			const action = mixerPaul.clipAction(gltf.animations[0])
+
+			// const moveBlinkClip = new AnimationClip("Armature|mixamo.com|Layer0.001")
+			// const mixer = new THREE.AnimationMixer(glft.scene)
+			// const action = mixer.clipAction(moveBlinkClip)
+
+			console.log(action)
+			action.play()
+
+		},
+		// called while loading is progressing
+		function ( xhr ) {
+
+			console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+		},
+		// called when loading has errors
+		function ( error ) {
+
+			console.log( 'An error happened' );
+
+		}
+	);
 
 ///////////////////
 // UI contruction
@@ -287,7 +342,7 @@ function makePanel() {
 		onSet: () => {
 
 			currentMesh = ( currentMesh + 1 ) % 3;
-			showMesh( currentMesh );
+			// showMesh( currentMesh );
 
 		}
 	} );
@@ -303,7 +358,7 @@ function makePanel() {
 
 			currentMesh -= 1;
 			if ( currentMesh < 0 ) currentMesh = 2;
-			showMesh( currentMesh );
+			// showMesh( currentMesh );
 
 		}
 	} );
@@ -327,14 +382,17 @@ function onWindowResize() {
 
 }
 
-//
-
+////////////
+// Annimate
+////////////
 function loop() {
 
 	// Don't forget, ThreeMeshUI must be updated manually.
 	// This has been introduced in version 3.0.0 in order
 	// to improve performance
 	ThreeMeshUI.update();
+
+	tick()
 
 	controls.update();
 
@@ -346,6 +404,27 @@ function loop() {
 	updateButtons();
 
 }
+
+const clock = new THREE.Clock()
+
+let previousTime = 0
+
+const tick = () => {
+
+    const elapsedTime = clock.getElapsedTime()
+
+	const deltaTime = elapsedTime - previousTime
+    previousTime = elapsedTime
+    // Update mixer
+    if(mixerPaul !== null){
+        mixerPaul.update(deltaTime)
+    }
+
+    window.requestAnimationFrame(tick)
+
+}
+
+
 
 // Called in the loop, get intersection with either the mouse or the VR controllers,
 // then update the buttons states according to result
