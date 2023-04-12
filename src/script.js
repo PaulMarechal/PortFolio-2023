@@ -208,10 +208,14 @@ function showMesh( id ) {
 	dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
 	loader.setDRACOLoader( dracoLoader );
 
+	const waiting = 'https://paulmarechal.xyz/test/paulFbx/paul_waiting.glb'
+	const run = 'https://paulmarechal.xyz/test/paulFbx/paul_run.glb'
+	const jump = 'https://paulmarechal.xyz/test/paulFbx/paul_jump_up.glb'
+
 	// Load a glTF resource
 	loader.load(
 		// resource URL
-		'https://paulmarechal.xyz/test/paul_waiting.glb',
+		waiting,
 		// called when the resource is loaded
 		function ( gltf ) {
 
