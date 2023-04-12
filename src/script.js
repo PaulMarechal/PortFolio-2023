@@ -208,14 +208,14 @@ function showMesh( id ) {
 	dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
 	loader.setDRACOLoader( dracoLoader );
 
-	const waiting = 'https://paulmarechal.xyz/test/paulFbx/paul_waiting.glb'
-	const run = 'https://paulmarechal.xyz/test/paulFbx/paul_run.glb'
-	const jump = 'https://paulmarechal.xyz/test/paulFbx/paul_jump_up.glb'
+	// const waiting = 'https://paulmarechal.xyz/test/paulFbx/paul_waiting.glb'
+	// const run = 'https://paulmarechal.xyz/test/paulFbx/paul_run.glb'
+	// const jump = 'https://paulmarechal.xyz/test/paulFbx/paul_jump_up.glb'
 
 	// Load a glTF resource
 	loader.load(
 		// resource URL
-		waiting,
+		'https://paulmarechal.xyz/test/paulFbx/paulMixAnim.gltf',
 		// called when the resource is loaded
 		function ( gltf ) {
 
@@ -231,15 +231,46 @@ function showMesh( id ) {
 			gltf.scene.position.set( 0, 0, -1.9 );
 
 			mixerPaul = new THREE.AnimationMixer(gltf.scene)
-			const action = mixerPaul.clipAction(gltf.animations[0])
+			const stay = mixerPaul.clipAction(gltf.animations[2])
+			const run = mixerPaul.clipAction(gltf.animations[1])
+			const jump = mixerPaul.clipAction(gltf.animations[0])
+
+
 
 			// const moveBlinkClip = new AnimationClip("Armature|mixamo.com|Layer0.001")
 			// const mixer = new THREE.AnimationMixer(glft.scene)
 			// const action = mixer.clipAction(moveBlinkClip)
 
-			console.log(action)
-			action.play()
+			console.log(gltf)
+			stay.play()
 
+			const log = document.getElementById('log');
+
+			document.addEventListener('keypress', logKey);
+
+			function logKey(e) {
+				switch (event.keyCode) {
+					// Espace
+					case 32:
+						run.stop()
+						jump.play();
+						// jump.setLoop(THREE.LoopOnce);
+						setTimeout(() => {
+							jump.stop()
+						}, 1930);
+						run.play();
+						break;
+					// Enter
+					case 13:	
+						// jump.stop()
+						run.play();
+						break;
+					default:
+						stay.play()
+						break;
+				}
+			}
+			
 		},
 		// called while loading is progressing
 		function ( xhr ) {
