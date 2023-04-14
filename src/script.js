@@ -66,14 +66,14 @@ directionalLight.shadow.camera.bottom = - 7
 directionalLight.position.set(5, 6, 3)
 scene.add(directionalLight)
 
-gui.add(directionalLight.shadow.camera, 'far').min(0).max(50).step(0.01).name('Shadow camera far')
-gui.add(directionalLight.shadow.camera, 'left').min(0).max(50).step(0.01).name('Shadow camera left')
-gui.add(directionalLight.shadow.camera, 'top').min(0).max(50).step(0.01).name('Shadow camera top')
-gui.add(directionalLight.shadow.camera, 'right').min(0).max(50).step(0.01).name('Shadow camera right')
-gui.add(directionalLight.shadow.camera, 'bottom').min(0).max(50).step(0.01).name('Shadow camera bottom')
-gui.add(directionalLight.position, 'x').min(0).max(50).step(0.01).name('Light.position X')
-gui.add(directionalLight.position, 'y').min(0).max(50).step(0.01).name('Light.position Y')
-gui.add(directionalLight.position, 'z').min(0).max(50).step(0.01).name('Light.position Z')
+// gui.add(directionalLight.shadow.camera, 'far').min(0).max(50).step(0.01).name('Shadow camera far')
+// gui.add(directionalLight.shadow.camera, 'left').min(0).max(50).step(0.01).name('Shadow camera left')
+// gui.add(directionalLight.shadow.camera, 'top').min(0).max(50).step(0.01).name('Shadow camera top')
+// gui.add(directionalLight.shadow.camera, 'right').min(0).max(50).step(0.01).name('Shadow camera right')
+// gui.add(directionalLight.shadow.camera, 'bottom').min(0).max(50).step(0.01).name('Shadow camera bottom')
+// gui.add(directionalLight.position, 'x').min(0).max(50).step(0.01).name('Light.position X')
+// gui.add(directionalLight.position, 'y').min(0).max(50).step(0.01).name('Light.position Y')
+// gui.add(directionalLight.position, 'z').min(0).max(50).step(0.01).name('Light.position Z')
 
 
 
@@ -124,26 +124,32 @@ camera.position.set(2, 2, 2)
 scene.add(camera)
 
 // Controls
-// const controls = new OrbitControls(camera, canvas)
-// controls.target.set(0, 0.75, 0)
 const controls = new OrbitControls( camera, canvas );
 camera.position.set( 0, 1.6, 0 );
 controls.target = new THREE.Vector3( 0, 1, -1.8 );
+controls.minDistance = 1; 
+controls.maxDistance = 2;
 controls.enableDamping = true
+
+controls.maxAzimuthAngle = Math.PI / 6;
+controls.minAzimuthAngle = - Math.PI / 6; 
+controls.maxPolarAngle = 1.5;
+controls.minPolarAngle = Math.PI / 5;
 
 /**
  * Imported models
  */
 // Room
-// const room = new THREE.LineSegments(
-// 	new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ).translate( 0, 3, 0 ),
-// 	new THREE.LineBasicMaterial( { color: 0x808080 } )
-// );
-// room.receiveShadow = true
-// scene.add( room );
+const room = new THREE.LineSegments(
+	new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ).translate( 0, 3, 0 ),
+	new THREE.LineBasicMaterial( { color: 0x808080 } )
+);
+room.receiveShadow = true
+scene.add( room );
 
 // Personnage
 let mixerPaul = null
+let cvBook = null
 
 // Instantiate a loader
 const loader = new GLTFLoader();
@@ -186,29 +192,27 @@ loader.load(
 
 		document.addEventListener('keypress', logKey);
 
+		let enterPressed = false;
+
 		function logKey(e) {
-			switch (event.keyCode) {
-				// Espace
-				case 32:
-					run.stop()
-					jump.play();
-					setTimeout(() => {
-						jump.stop()
-					}, 1930);
-					run.play();
-					break;
-
-				// Enter
-				case 13:	
-					run.play();
-					break;
-
-				// Default
-				default:
-					stay.play()
-					break;
+			// Touche enter pressed
+			if (e.keyCode === 13) { 
+				enterPressed = true;
+				run.play();
+			// Else if space is pressed
+			} else if (enterPressed && e.keyCode === 32) { 
+				run.stop();
+				jump.play();
+				setTimeout(() => {
+				jump.stop();
+				}, 1930);
+				run.play();
+			} else {
+				// Else stay
+				stay.play();
 			}
-		}	
+		}
+		  
 	},
 	// called while loading is progressing
 	function ( xhr ) {
@@ -224,14 +228,32 @@ loader.load(
 	}
 );
 
-// CV
-const geometry = new THREE.BoxGeometry( 0.4, 0.4, 0.4 );
-const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-const cube = new THREE.Mesh( geometry, material );
-cube.position.set( 1, 0, -1.9 );
-cube.receiveShadow = true;
-cube.castShadow = true;
-scene.add( cube );
+// CV book
+loader.load(
+	// resource URL
+	'https://paulmarechal.xyz/test/paulFbx/book3.glb',
+	// called when the resource is loaded
+	function ( gltf ) {
+		gltf.scene.position.set(1, 0, -1.9)
+		gltf.scene.scale.set(0.2, 0.2, 0.2);
+		gltf.receiveShadow = true;
+		gltf.castShadow = true;
+
+		// gui.add(gltf.scene.rotation, 'x').min(0).max(50).step(0.01).name('Light.position X')
+		// gui.add(gltf.scene.rotation, 'y').min(0).max(50).step(0.01).name('Light.position Y')
+		// gui.add(gltf.scene.rotation, 'z').min(0).max(50).step(0.01).name('Light.position Z')
+
+		gltf.scene.traverse( function( node ) {
+
+			if ( node.isMesh ) { node.castShadow = true; }
+	
+		} );
+		
+		cvBook = gltf.scene
+		scene.add( gltf.scene);
+	}
+);
+
 
 /**
  * Renderer
@@ -246,6 +268,8 @@ renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
+console.log(cvBook)
+
 /**
  * Animate
  */
@@ -258,11 +282,33 @@ const tick = () =>
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
 
-	cube.position.y = Math.sin(clock.getElapsedTime()) * 0.5 + 0.5;
+	// cube.position.y = Math.sin(clock.getElapsedTime()) * 0.5 + 0.5;
 
-    if(mixerPaul !== null){
+	function handleKeyPress(e) {
+		if (cvBook !== null && e.keyCode === 13) {
+			let rotationY = 0;
+			function updatePosition() {
+				cvBook.position.y = Math.sin(clock.getElapsedTime()) * 0.5 + 0.5;
+
+				rotationY += 0.01;
+				if (rotationY * 1.55 < 1.55) {
+					cvBook.rotation.y = Math.min(rotationY * 1.55, 1.55);
+
+				}
+				requestAnimationFrame(updatePosition);
+			}
+			updatePosition();
+		}
+	}
+	  
+	document.addEventListener('keypress', handleKeyPress);
+	  
+	  
+	  
+	if(mixerPaul !== null){
         mixerPaul.update(deltaTime)
     }
+
 
     // Update controls
     controls.update()
