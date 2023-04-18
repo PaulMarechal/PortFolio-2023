@@ -120,12 +120,11 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(2, 2, 2)
+camera.position.set( 0, 1.6, 0 );
 scene.add(camera)
 
 // Controls
 const controls = new OrbitControls( camera, canvas );
-camera.position.set( 0, 1.6, 0 );
 controls.target = new THREE.Vector3( 0, 1, -1.8 );
 controls.minDistance = 1; 
 controls.maxDistance = 2;
@@ -185,7 +184,7 @@ loader.load(
 	
 		scene.add( gltf.scene );
 
-		console.log(gltf)
+		// console.log(gltf)
 		stay.play()
 
 		const log = document.getElementById('log');
@@ -273,28 +272,49 @@ console.log(cvBook)
 /**
  * Animate
  */
+
 const clock = new THREE.Clock()
 let previousTime = 0
 
-const tick = () =>
-{
+const tick = () => {
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
-
-	// cube.position.y = Math.sin(clock.getElapsedTime()) * 0.5 + 0.5;
+	
+	let sceneObjects = scene.children.filter(child => child.name === "Scene");
 
 	function handleKeyPress(e) {
 		if (cvBook !== null && e.keyCode === 13) {
+	  
 			let rotationY = 0;
-			function updatePosition() {
-				cvBook.position.y = Math.sin(clock.getElapsedTime()) * 0.5 + 0.5;
+			let posXs = sceneObjects.map(obj => obj.position.x); 
+			let camPos = 5
 
+			function updatePosition() {
+				if (cvBook.position.y >= 0.4950) {
+					cvBook.position.y = Math.sin(clock.getElapsedTime()) * 0.3 + 0.8;
+				} else {
+					cvBook.position.y = Math.sin(clock.getElapsedTime()) * 0.5 + 0.5;
+				}
+				
+				// Rotation 3D models ( book + avatar)
 				rotationY += 0.01;
 				if (rotationY * 1.55 < 1.55) {
-					cvBook.rotation.y = Math.min(rotationY * 1.55, 1.55);
+					sceneObjects.forEach((obj, index) => {
+						obj.rotation.y = Math.min(rotationY * 1.55, 1.55);
+					});
+				} else {
+					// maj all X position
+					posXs = posXs.map(posX => posX + 0.03); 
+					sceneObjects.forEach((obj, index) => {
 
+						// Define new x position for each obj
+						obj.position.x = posXs[index]; 
+					})
 				}
+				camera.position.set((cvBook.position.x - 0.5), 1.6, 0);
+				controls.target.set((cvBook.position.x - 0.5), 1, - 1.8);
+
 				requestAnimationFrame(updatePosition);
 			}
 			updatePosition();
@@ -303,12 +323,9 @@ const tick = () =>
 	  
 	document.addEventListener('keypress', handleKeyPress);
 	  
-	  
-	  
 	if(mixerPaul !== null){
         mixerPaul.update(deltaTime)
     }
-
 
     // Update controls
     controls.update()
