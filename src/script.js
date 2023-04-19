@@ -167,7 +167,7 @@ loader.load(
 		gltf.scenes; 
 		gltf.cameras;
 		gltf.asset; 
-		gltf.scene.scale.set(0.9, 0.9, 0.9); 
+		// gltf.scene.scale.set(0.9, 0.9, 0.9); 
 		gltf.scene.position.set( 0, 0, -1.9 );
 		mixerPaul = new THREE.AnimationMixer(gltf.scene)
 		const stay = mixerPaul.clipAction(gltf.animations[2])
@@ -200,12 +200,27 @@ loader.load(
 				run.play();
 			// Else if space is pressed
 			} else if (enterPressed && e.keyCode === 32) { 
-				run.stop();
-				jump.play();
-				setTimeout(() => {
-				jump.stop();
-				}, 1930);
-				run.play();
+
+				function updateJump(){
+					run.stop();
+					jump.play();
+					const startTime = clock.getElapsedTime();
+					const jumpDuration = 1; // Durée du saut en secondes
+					function animateJump() {
+					  	const timeElapsed = clock.getElapsedTime() - startTime;
+					 	if (timeElapsed >= jumpDuration) {
+							jump.stop();
+							run.play();
+							return;
+					  	}
+					  	const jumpHeight = Math.max(0, Math.sin(timeElapsed / jumpDuration * Math.PI) * 1.3);
+					  	gltf.scene.position.y = jumpHeight;
+					 	requestAnimationFrame(animateJump);
+					}
+					animateJump();
+				}
+				updateJump();
+				  
 			} else {
 				// Else stay
 				stay.play();
