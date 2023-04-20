@@ -23,7 +23,7 @@ import * as dat from 'lil-gui'
  * Base
  */
 // Debug
-const gui = new dat.GUI()
+// const gui = new dat.GUI()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -205,7 +205,7 @@ loader.load(
 					run.stop();
 					jump.play();
 					const startTime = clock.getElapsedTime();
-					const jumpDuration = 1; // Durée du saut en secondes
+					const jumpDuration = 0.9; // Jump time in second
 					function animateJump() {
 					  	const timeElapsed = clock.getElapsedTime() - startTime;
 					 	if (timeElapsed >= jumpDuration) {
