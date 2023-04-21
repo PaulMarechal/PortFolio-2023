@@ -44,11 +44,25 @@ world.gravity.set(0, -9.82, 0)
 const sphereShape = new CANNON.Sphere(0.5)
 const sphereBody = new CANNON.Body({
 	mass: 1, 
-	position: new CANNON.Vec3(0, 3, 0), 
+	position: new CANNON.Vec3(0, 0, -1.9), 
 	shape: sphereShape
 })
 
 world.addBody(sphereBody)
+
+// Floor
+const floorShape = new CANNON.Plane()
+const floorBody = new CANNON.Body({
+	position: new CANNON.Vec3(0, -0.5, 0)
+})
+// Value 0 because dont move - stay static
+floorBody.mass = 0
+floorBody.addShape(floorShape)
+floorBody.quaternion.setFromAxisAngle(
+	new CANNON.Vec3(-1, 0, 0),
+	Math.PI * 0.5, 
+)
+world.addBody(floorBody)
 
 
 
@@ -146,14 +160,14 @@ scene.add(camera)
 // Controls
 const controls = new OrbitControls( camera, canvas );
 controls.target = new THREE.Vector3( 0, 1, -1.8 );
-controls.minDistance = 1; 
-controls.maxDistance = 2;
+// controls.minDistance = 1; 
+// controls.maxDistance = 2;
 controls.enableDamping = true
 
-controls.maxAzimuthAngle = Math.PI / 6;
-controls.minAzimuthAngle = - Math.PI / 6; 
-controls.maxPolarAngle = 1.5;
-controls.minPolarAngle = Math.PI / 5;
+// controls.maxAzimuthAngle = Math.PI / 6;
+// controls.minAzimuthAngle = - Math.PI / 6; 
+// controls.maxPolarAngle = 1.5;
+// controls.minPolarAngle = Math.PI / 5;
 
 /**
  * Imported models
@@ -351,17 +365,18 @@ const tick = () => {
 
 						// Update physics world (fixed timesstamp (60 frame per second) / time past sine the last step / how much iteration the world can apply)
 						world.step(1/60, previousTime, 3)
-
-						sceneObjects[1].position.x = sphereBody.position.x
-						sceneObjects[1].position.y = sphereBody.position.y 
-						sceneObjects[1].position.z = sphereBody.position.z
+						
+						sceneObjects[1].position.copy(sphereBody.position)
+						// sceneObjects[1].position.x = sphereBody.position.x
+						// sceneObjects[1].position.y = sphereBody.position.y 
+						// sceneObjects[1].position.z = sphereBody.position.z
 						console.log(sphereBody.position.y)
-						console.log(sceneObjects[1].position.y)
+						// console.log(sceneObjects[1].position.x)
 
 					})
 				}
-				camera.position.set((cvBook.position.x - 0.5), 1.6, 0);
-				controls.target.set((cvBook.position.x - 0.5), 1, - 1.8);
+				// camera.position.set((cvBook.position.x - 0.5), 1.6, 0);
+				// controls.target.set((cvBook.position.x - 0.5), 1, - 1.8);
 
 				requestAnimationFrame(updatePosition);
 			}
