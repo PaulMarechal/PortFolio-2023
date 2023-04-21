@@ -17,6 +17,7 @@ import FontImage from 'three-mesh-ui/examples/assets/Roboto-msdf.png';
 import * as TextPanel from "./textPanel.js";
 import * as NameRooms from "./roomInfo.js";
 import * as dat from 'lil-gui'
+import CANNON from 'cannon'
 
 
 /**
@@ -31,6 +32,25 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 scene.background = new THREE.Color( 0x505050 );
+
+/**
+ * Physics
+ */ 
+// World
+const world = new CANNON.World()
+world.gravity.set(0, -9.82, 0)
+
+// Sphere
+const sphereShape = new CANNON.Sphere(0.5)
+const sphereBody = new CANNON.Body({
+	mass: 1, 
+	position: new CANNON.Vec3(0, 3, 0), 
+	shape: sphereShape
+})
+
+world.addBody(sphereBody)
+
+
 
 /**
  * Floor
@@ -175,6 +195,7 @@ loader.load(
 		const jump = mixerPaul.clipAction(gltf.animations[0])
 		gltf.receiveShadow = true;
 		gltf.castShadow = true;
+		gltf.name = "Paul"
 
 		gltf.scene.traverse( function( node ) {
 
@@ -264,7 +285,7 @@ loader.load(
 		} );
 		
 		cvBook = gltf.scene
-		scene.add( gltf.scene);
+		scene.add(gltf.scene);
 	}
 );
 
@@ -282,8 +303,6 @@ renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-console.log(cvBook)
-
 /**
  * Animate
  */
@@ -295,8 +314,12 @@ const tick = () => {
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
+
+	// console.log(scene)
 	
 	let sceneObjects = scene.children.filter(child => child.name === "Scene");
+
+	// console.log(scene.child[7])
 
 	function handleKeyPress(e) {
 		if (cvBook !== null && e.keyCode === 13) {
@@ -322,9 +345,19 @@ const tick = () => {
 					// maj all X position
 					posXs = posXs.map(posX => posX + 0.03); 
 					sceneObjects.forEach((obj, index) => {
-
+						// console.log(obj)
 						// Define new x position for each obj
 						obj.position.x = posXs[index]; 
+
+						// Update physics world (fixed timesstamp (60 frame per second) / time past sine the last step / how much iteration the world can apply)
+						world.step(1/60, previousTime, 3)
+
+						sceneObjects[1].position.x = sphereBody.position.x
+						sceneObjects[1].position.y = sphereBody.position.y 
+						sceneObjects[1].position.z = sphereBody.position.z
+						console.log(sphereBody.position.y)
+						console.log(sceneObjects[1].position.y)
+
 					})
 				}
 				camera.position.set((cvBook.position.x - 0.5), 1.6, 0);
