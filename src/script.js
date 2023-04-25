@@ -40,6 +40,21 @@ scene.background = new THREE.Color( 0x505050 );
 const world = new CANNON.World()
 world.gravity.set(0, -9.82, 0)
 
+// Material
+const defaultMaterial = new CANNON.Material('default')
+
+const defaultContactMaterial = new CANNON.ContactMaterial(
+	defaultMaterial, 
+	defaultMaterial, 
+	{
+		friction: 0.1, 
+		restitution: 0.7
+	}
+)
+
+world.addContactMaterial(defaultContactMaterial)
+world.defaultContactMaterial = defaultContactMaterial
+
 // Sphere
 const sphereShape = new CANNON.Sphere(0.5)
 const sphereBody = new CANNON.Body({
@@ -62,6 +77,8 @@ floorBody.quaternion.setFromAxisAngle(
 	new CANNON.Vec3(-1, 0, 0),
 	Math.PI * 0.5, 
 )
+
+sphereBody.applyLocalForce(new CANNON.Vec3(20, 0, 0), new CANNON.Vec3(0, 0, 0))
 world.addBody(floorBody)
 
 
@@ -357,7 +374,7 @@ const tick = () => {
 					});
 				} else {
 					// maj all X position
-					posXs = posXs.map(posX => posX + 0.03); 
+					posXs = posXs.map(posX => posX / 0.03); 
 					sceneObjects.forEach((obj, index) => {
 						// console.log(obj)
 						// Define new x position for each obj
@@ -370,7 +387,7 @@ const tick = () => {
 						// sceneObjects[1].position.x = sphereBody.position.x
 						// sceneObjects[1].position.y = sphereBody.position.y 
 						// sceneObjects[1].position.z = sphereBody.position.z
-						console.log(sphereBody.position.y)
+						console.log(sphereBody.position.x)
 						// console.log(sceneObjects[1].position.x)
 
 					})
