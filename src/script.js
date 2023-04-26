@@ -17,7 +17,7 @@ import FontImage from 'three-mesh-ui/examples/assets/Roboto-msdf.png';
 import * as TextPanel from "./textPanel.js";
 import * as NameRooms from "./roomInfo.js";
 import * as dat from 'lil-gui'
-import CANNON from 'cannon'
+
 
 
 /**
@@ -147,6 +147,13 @@ const room = new THREE.LineSegments(
 room.receiveShadow = true
 scene.add( room );
 
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+const cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+cube.position.set(4, 0.5, -2)
+const boxHeight = 1
+
 // Personnage
 let mixerPaul = null
 let cvBook = null
@@ -157,6 +164,7 @@ const loader = new GLTFLoader();
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
 loader.setDRACOLoader( dracoLoader );
+
 
 // Load a glTF 
 loader.load(
@@ -208,15 +216,26 @@ loader.load(
 					jump.play();
 					const startTime = clock.getElapsedTime();
 					const jumpDuration = 0.9; // Jump time in second
+					const boxTop = cube.position.y + cube.geometry.parameters.height / 2
+					const characterBottom = gltf.scene.position.y 
+					const initialJumpHeight = gltf.scene.position.y - boxTop;
 					function animateJump() {
 					  	const timeElapsed = clock.getElapsedTime() - startTime;
 					 	if (timeElapsed >= jumpDuration) {
+							console.log(gltf.scene)
+							const characterTop = gltf.scene.position.y 
+							
+
+							if(characterTop >= boxTop){
+								// Avatar on the box
+								gltf.scene.position.y = boxTop - gltf.scene.geometry.boundingBox.max.y
+							}
 							jump.stop();
 							run.play();
 							return;
 					  	}
 					  	const jumpHeight = Math.max(0, Math.sin(timeElapsed / jumpDuration * Math.PI) * 1.3);
-					  	gltf.scene.position.y = jumpHeight;
+					  	gltf.scene.position.y = boxTop + initialJumpHeight + jumpHeight - characterBottom;
 					 	requestAnimationFrame(animateJump);
 					}
 					animateJump();
@@ -243,6 +262,7 @@ loader.load(
 
 	}
 );
+
 
 // CV book
 loader.load(
