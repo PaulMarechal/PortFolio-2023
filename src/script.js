@@ -37,7 +37,7 @@ scene.background = new THREE.Color( 0x505050 );
  * Floor
  */
 const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(10, 10),
+    new THREE.PlaneGeometry(100, 10),
     new THREE.MeshStandardMaterial({
         color: '#444444',
         metalness: 0,
@@ -141,7 +141,7 @@ controls.enableDamping = true
  */
 // Room
 const room = new THREE.LineSegments(
-	new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ).translate( 0, 3, 0 ),
+	new BoxLineGeometry( 60, 6, 6, 100, 10, 10 ).translate( 0, 3, 0 ),
 	new THREE.LineBasicMaterial( { color: 0x808080 } )
 );
 room.receiveShadow = true
@@ -226,39 +226,40 @@ loader.load(
 					const characterTop = gltf.scene.position.y;
 					
 					function animateJump() {
-					  const timeElapsed = clock.getElapsedTime() - startTime;
-					  if (timeElapsed >= jumpDuration) {
-						console.log("first");
-						console.log("***************")
-						console.log(characterTop)
-						console.log(boxTop)
-						console.log("***************")
-						// if (jumpHeight >= boxTop) {
-						// 	console.log("second")
-						//   // Avatar on the box
-						//   paul = boxTop - characterHeight;
-						// }
-						jump.stop();
-						run.play();
-						return;
-					  }
-					  const jumpHeight = Math.max(0, Math.sin(timeElapsed / jumpDuration * Math.PI) * 1.3);
-					//   gltf.scene.position.y = boxTop + initialJumpHeight + jumpHeight - characterBottom;
-					  requestAnimationFrame(animateJump);
-					  if (jumpHeight >= boxTop) {
-						console.log("second")
-					  // Avatar on the box
-					//   gltf.scene.position.y = paul
-					gltf.scene.position.y = boxTop + initialJumpHeight + jumpHeight - characterBottom;
+					  	const timeElapsed = clock.getElapsedTime() - startTime;
+					  	if (timeElapsed >= jumpDuration) {
+							// console.log("first");
+							// console.log("***************")
+							// console.log(characterTop)
+							// console.log(boxTop)
+							// console.log("***************")
 
-					  console.log(paul)
-					}
+							// if (jumpHeight >= boxTop) {
+							// 	console.log("second")
+							//   // Avatar on the box
+							//   paul = boxTop - characterHeight;
+							// }
+							jump.stop();
+							run.play();
+							return;
+						}
+					  	const jumpHeight = Math.max(0, Math.sin(timeElapsed / jumpDuration * Math.PI) * 1.3);
+						//   gltf.scene.position.y = boxTop + initialJumpHeight + jumpHeight - characterBottom;
+					  	requestAnimationFrame(animateJump);
+					  	if (jumpHeight >= boxTop) {
+						  	// Avatar on the box
+						  	//   gltf.scene.position.y = paul
+						  	gltf.scene.position.y = boxTop + initialJumpHeight + jumpHeight - characterBottom;
+						  
+						  	console.log("second")
+					  		console.log(paul)
+							setTimeout(() => {
+								gltf.scene.position.y = 0
+							}, 2000);
+						}
 					}
 					animateJump();
-				  }
-				  
-
-
+				}
 
 				updateJump();
 				  
