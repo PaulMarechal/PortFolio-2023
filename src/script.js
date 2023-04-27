@@ -17,7 +17,7 @@ import FontImage from 'three-mesh-ui/examples/assets/Roboto-msdf.png';
 import * as TextPanel from "./textPanel.js";
 import * as NameRooms from "./roomInfo.js";
 import * as dat from 'lil-gui'
-import CANNON from 'cannon'
+
 
 
 /**
@@ -37,7 +37,7 @@ scene.background = new THREE.Color( 0x505050 );
  * Floor
  */
 const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(10, 10),
+    new THREE.PlaneGeometry(100, 10),
     new THREE.MeshStandardMaterial({
         color: '#444444',
         metalness: 0,
@@ -141,15 +141,17 @@ controls.enableDamping = true
  */
 // Room
 const room = new THREE.LineSegments(
-	new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ).translate( 0, 3, 0 ),
+	new BoxLineGeometry( 60, 6, 6, 100, 10, 10 ).translate( 0, 3, 0 ),
 	new THREE.LineBasicMaterial( { color: 0x808080 } )
 );
 room.receiveShadow = true
 scene.add( room );
 
+
 // Personnage
 let mixerPaul = null
 let cvBook = null
+let paul = null
 
 // Instantiate a loader
 const loader = new GLTFLoader();
@@ -157,6 +159,13 @@ const loader = new GLTFLoader();
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
 loader.setDRACOLoader( dracoLoader );
+
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+const cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+cube.position.set(4, 0, -2)
+
 
 // Load a glTF 
 loader.load(
@@ -174,9 +183,11 @@ loader.load(
 		const stay = mixerPaul.clipAction(gltf.animations[2])
 		const run = mixerPaul.clipAction(gltf.animations[1])
 		const jump = mixerPaul.clipAction(gltf.animations[0])
+		paul = (gltf.scene.position.y + 0.5)
 		gltf.receiveShadow = true;
 		gltf.castShadow = true;
 		gltf.name = "Paul"
+
 
 		gltf.scene.traverse( function( node ) {
 
@@ -203,24 +214,53 @@ loader.load(
 			// Else if space is pressed
 			} else if (enterPressed && e.keyCode === 32) { 
 
-				function updateJump(){
+				function updateJump() {
 					run.stop();
 					jump.play();
 					const startTime = clock.getElapsedTime();
 					const jumpDuration = 0.9; // Jump time in second
+					const boxTop = cube.position.y + cube.geometry.parameters.height / 2;
+					const characterBottom = gltf.scene.position.y;
+					const initialJumpHeight = gltf.scene.position.y - boxTop;
+					const characterHeight = gltf.scene.geometry && gltf.scene.geometry.boundingBox ? gltf.scene.geometry.boundingBox.max.y : 1; // default height is 1
+					const characterTop = gltf.scene.position.y;
+					
 					function animateJump() {
 					  	const timeElapsed = clock.getElapsedTime() - startTime;
-					 	if (timeElapsed >= jumpDuration) {
+					  	if (timeElapsed >= jumpDuration) {
+							// console.log("first");
+							// console.log("***************")
+							// console.log(characterTop)
+							// console.log(boxTop)
+							// console.log("***************")
+
+							// if (jumpHeight >= boxTop) {
+							// 	console.log("second")
+							//   // Avatar on the box
+							//   paul = boxTop - characterHeight;
+							// }
 							jump.stop();
 							run.play();
 							return;
-					  	}
+						}
 					  	const jumpHeight = Math.max(0, Math.sin(timeElapsed / jumpDuration * Math.PI) * 1.3);
-					  	gltf.scene.position.y = jumpHeight;
-					 	requestAnimationFrame(animateJump);
+						//   gltf.scene.position.y = boxTop + initialJumpHeight + jumpHeight - characterBottom;
+					  	requestAnimationFrame(animateJump);
+					  	if (jumpHeight >= boxTop) {
+						  	// Avatar on the box
+						  	//   gltf.scene.position.y = paul
+						  	gltf.scene.position.y = boxTop + initialJumpHeight + jumpHeight - characterBottom;
+						  
+						  	console.log("second")
+					  		console.log(paul)
+							setTimeout(() => {
+								gltf.scene.position.y = 0
+							}, 2000);
+						}
 					}
 					animateJump();
 				}
+
 				updateJump();
 				  
 			} else {
@@ -243,6 +283,7 @@ loader.load(
 
 	}
 );
+
 
 // CV book
 loader.load(
@@ -342,9 +383,12 @@ const tick = () => {
 	}
 	  
 	document.addEventListener('keypress', handleKeyPress);
+
+	console.log(paul)
 	  
 	if(mixerPaul !== null){
         mixerPaul.update(deltaTime)
+		// const characterTop = gltf.scene.position.y ;
     }
 
     // Update controls
