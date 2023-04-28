@@ -37,7 +37,7 @@ scene.background = new THREE.Color( 0x505050 );
  * Floor
  */
 const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(10, 10),
+    new THREE.PlaneGeometry(60, 10),
     new THREE.MeshStandardMaterial({
         color: '#444444',
         metalness: 0,
@@ -141,7 +141,7 @@ controls.enableDamping = true
  */
 // Room
 const room = new THREE.LineSegments(
-	new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ).translate( 0, 3, 0 ),
+	new BoxLineGeometry( 60, 6, 6, 100, 10, 10 ).translate( 0, 3, 0 ),
 	new THREE.LineBasicMaterial( { color: 0x808080 } )
 );
 room.receiveShadow = true
