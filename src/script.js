@@ -147,6 +147,13 @@ const room = new THREE.LineSegments(
 room.receiveShadow = true
 scene.add( room );
 
+// Box ( jump )
+const geometry = new THREE.BoxGeometry( 0.5, 1, 1 ); 
+const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} ); 
+const cube = new THREE.Mesh( geometry, material ); 
+cube.position.set(3, 0, -1.9)
+scene.add( cube );
+
 // Personnage
 let mixerPaul = null
 let cvBook = null
@@ -332,8 +339,8 @@ const tick = () => {
 
 					})
 				}
-				// camera.position.set((cvBook.position.x - 0.5), 1.6, 0);
-				// controls.target.set((cvBook.position.x - 0.5), 1, - 1.8);
+				camera.position.set((cvBook.position.x - 0.5), 1, 1);
+				controls.target.set((cvBook.position.x - 0.5), 1, - 1.8);
 
 				requestAnimationFrame(updatePosition);
 			}
