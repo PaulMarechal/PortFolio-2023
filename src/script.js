@@ -177,6 +177,8 @@ const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
 loader.setDRACOLoader( dracoLoader );
 
+let stay, run, jump;
+
 // Load a glTF 
 loader.load(
 	'https://paulmarechal.xyz/test/paulFbx/paulMixAnim.gltf',
@@ -190,9 +192,9 @@ loader.load(
 		// gltf.scene.scale.set(0.9, 0.9, 0.9); 
 		gltf.scene.position.set( 0, 0, -1.9 );
 		mixerPaul = new THREE.AnimationMixer(gltf.scene)
-		const stay = mixerPaul.clipAction(gltf.animations[2])
-		const run = mixerPaul.clipAction(gltf.animations[1])
-		const jump = mixerPaul.clipAction(gltf.animations[0])
+		stay = mixerPaul.clipAction(gltf.animations[2])
+		run = mixerPaul.clipAction(gltf.animations[1])
+		jump = mixerPaul.clipAction(gltf.animations[0])
 		gltf.receiveShadow = true;
 		gltf.castShadow = true;
 		gltf.name = "Paul"
@@ -313,19 +315,19 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 const clock = new THREE.Clock()
 let previousTime = 0
+let sceneObjects = null
 
 const tick = () => {
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
 
-	// console.log(scene)
-	
-	let sceneObjects = scene.children.filter(child => child.name === "Scene" || child.name === "cubetest");
-
+	console.log(sceneObjects)
 	// console.log(scene.child[7])
 
 	function handleKeyPress(e) {
+		sceneObjects = scene.children.filter(child => child.name === "Scene" || child.name === "cubetest");
+
 		if (cvBook !== null && e.keyCode === 13) {
 	  
 			let rotationY = 0;
@@ -355,7 +357,6 @@ const tick = () => {
 						// console.log(obj)
 						// Define new x position for each obj
 						obj.position.x = posXs[index]; 
-
 					})
 				}
 				camera.position.set((cvBook.position.x - 0.5), 1, 1);
@@ -377,8 +378,26 @@ const tick = () => {
 	const cubeTestBox = new THREE.Box3().setFromObject(cubeTest);
 
 	if (cubeTestBox.intersectsBox(cubeBox)) {
-		console.log("touché")		
-	}
+		console.log("touché")
+		run.stop()
+		// previousTime = elapsedTime;
+		sceneObjects.splice(1, 1);
+
+		console.log(sceneObjects[1])
+
+		console.log(previousTime)
+		// console.log("//////////////////////////")
+		// console.log(sceneObjects[1])	
+		// console.log("****************")
+		// console.log(sceneObjects[1].children)
+		// console.log("//////////////////////////")
+		// mixerPaul = new THREE.AnimationMixer(sceneObjects[1])
+		// const stay = mixerPaul.clipAction(sceneObjects[1].animations[2])
+		// console.log(stay)
+		stay.play()
+		// updatePosition().remove()
+		// sceneObjects[1].clipAction(sceneObjects[1].animations[2])
+	} 
 
     // Update controls
     controls.update()
