@@ -151,8 +151,20 @@ scene.add( room );
 const geometry = new THREE.BoxGeometry( 0.5, 1, 1 ); 
 const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} ); 
 const cube = new THREE.Mesh( geometry, material ); 
+cube.name = "cube"
 cube.position.set(3, 0, -1.9)
 scene.add( cube );
+
+// Box ( jump )
+const geometryTest = new THREE.BoxGeometry( 0.5, 1.9, 0.5 ); 
+const materialTest = new THREE.MeshBasicMaterial( {
+	color: 0x00ff00, 
+	wireframe : true, 
+} ); 
+const cubeTest = new THREE.Mesh( geometryTest, materialTest ); 
+cubeTest.position.set(0, 0.97, -1.9)
+cubeTest.name = "cubetest"
+scene.add( cubeTest );
 
 // Personnage
 let mixerPaul = null
@@ -224,6 +236,10 @@ loader.load(
 					  	}
 					  	const jumpHeight = Math.max(0, Math.sin(timeElapsed / jumpDuration * Math.PI) * 1.3);
 					  	gltf.scene.position.y = jumpHeight;
+						cubeTest.position.y = jumpHeight + 1
+						// scene.children.filter(child.name => child.name === "cubetest").position.y 
+						// console.log(cubetest)
+
 					 	requestAnimationFrame(animateJump);
 					}
 					animateJump();
@@ -305,7 +321,7 @@ const tick = () => {
 
 	// console.log(scene)
 	
-	let sceneObjects = scene.children.filter(child => child.name === "Scene");
+	let sceneObjects = scene.children.filter(child => child.name === "Scene" || child.name === "cubetest");
 
 	// console.log(scene.child[7])
 
@@ -332,6 +348,9 @@ const tick = () => {
 				} else {
 					// maj all X position
 					posXs = posXs.map(posX => posX + 0.03); 
+					// console.log(posXs);
+					// console.log(cubeTest)
+					// cubeTest.position.x = cvBook.position.x - 1
 					sceneObjects.forEach((obj, index) => {
 						// console.log(obj)
 						// Define new x position for each obj
@@ -353,6 +372,13 @@ const tick = () => {
 	if(mixerPaul !== null){
         mixerPaul.update(deltaTime)
     }
+
+	const cubeBox = new THREE.Box3().setFromObject(cube);
+	const cubeTestBox = new THREE.Box3().setFromObject(cubeTest);
+
+	if (cubeTestBox.intersectsBox(cubeBox)) {
+		console.log("touché")		
+	}
 
     // Update controls
     controls.update()
