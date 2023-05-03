@@ -160,7 +160,8 @@ scene.add( cube );
 const geometryTest = new THREE.BoxGeometry( 0.5, 1.9, 0.5 ); 
 const materialTest = new THREE.MeshBasicMaterial( {
 	color: 0x00ff00, 
-	wireframe : true, 
+	wireframe: true,
+	// opacity: 0
 } ); 
 const cubeTest = new THREE.Mesh( geometryTest, materialTest ); 
 cubeTest.position.set(0, 0.97, -1.9)
@@ -181,6 +182,7 @@ loader.setDRACOLoader( dracoLoader );
 let stay, run, jump;
 
 let enterPressed = false;
+let isJump = false;
 
 // Load a glTF 
 loader.load(
@@ -237,6 +239,7 @@ loader.load(
 					  	const timeElapsed = clock.getElapsedTime() - startTime;
 						console.log(`start time : ${startTime}`)
 						console.log(`timeElapsed : ${timeElapsed}`)
+						isJump = true;
 
 						const jumpHeight = Math.max(0, Math.sin(timeElapsed / jumpDuration * Math.PI) * 1.3);
 						gltf.scene.position.y = jumpHeight;
@@ -246,6 +249,7 @@ loader.load(
 							console.log("et la")
 							jump.stop();
 							run.play();
+							isJump = false
 							return;
 					  	}
 						// console.log("et encore la")
@@ -415,9 +419,11 @@ const tick = () => {
 		} else {
 			console.log("touche pas")
 			// if(sceneObjects){
+				if(!isJump){
+					sceneObjects[2].position.y = 0
+				}
 				// if(sceneObjects[2].position.y !== 0){
 					// Problème ici pour le saut 
-					sceneObjects[2].position.y = 0
 				// }
 			// }
 		}
