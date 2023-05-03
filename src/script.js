@@ -45,6 +45,7 @@ const floor = new THREE.Mesh(
     })
 )
 floor.receiveShadow = true
+floor.name = "floor"
 floor.castShadow = true;
 floor.rotation.x = - Math.PI * 0.5
 scene.add(floor)
@@ -155,7 +156,7 @@ cube.name = "cube"
 cube.position.set(3, 0, -1.9)
 scene.add( cube );
 
-// Box ( jump )
+// Box ( avatar )
 const geometryTest = new THREE.BoxGeometry( 0.5, 1.9, 0.5 ); 
 const materialTest = new THREE.MeshBasicMaterial( {
 	color: 0x00ff00, 
@@ -178,6 +179,8 @@ dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
 loader.setDRACOLoader( dracoLoader );
 
 let stay, run, jump;
+
+let enterPressed = false;
 
 // Load a glTF 
 loader.load(
@@ -214,9 +217,8 @@ loader.load(
 
 		document.addEventListener('keypress', logKey);
 
-		let enterPressed = false;
-
 		function logKey(e) {
+			enterPressed = true;
 			// Touche enter pressed
 			if (e.keyCode === 13) { 
 				enterPressed = true;
@@ -225,25 +227,33 @@ loader.load(
 			} else if (enterPressed && e.keyCode === 32) { 
 
 				function updateJump(){
+					console.log("ici")
 					run.stop();
 					jump.play();
 					const startTime = clock.getElapsedTime();
 					const jumpDuration = 0.9; // Jump time in second
 					function animateJump() {
+						// console.log("la")
 					  	const timeElapsed = clock.getElapsedTime() - startTime;
+						console.log(`start time : ${startTime}`)
+						console.log(`timeElapsed : ${timeElapsed}`)
+
+						const jumpHeight = Math.max(0, Math.sin(timeElapsed / jumpDuration * Math.PI) * 1.3);
+						gltf.scene.position.y = jumpHeight;
+					  	// cubeTest.position.y = jumpHeight + 1
+	
 					 	if (timeElapsed >= jumpDuration) {
+							console.log("et la")
 							jump.stop();
 							run.play();
 							return;
 					  	}
-					  	const jumpHeight = Math.max(0, Math.sin(timeElapsed / jumpDuration * Math.PI) * 1.3);
-					  	gltf.scene.position.y = jumpHeight;
-						cubeTest.position.y = jumpHeight + 1
-						// scene.children.filter(child.name => child.name === "cubetest").position.y 
-						// console.log(cubetest)
+						// console.log("et encore la")
+		
 
 					 	requestAnimationFrame(animateJump);
 					}
+					// console.log("ici")
 					animateJump();
 				}
 				updateJump();
@@ -321,12 +331,13 @@ const tick = () => {
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
-
-	console.log(sceneObjects)
+	
 	// console.log(scene.child[7])
 
 	function handleKeyPress(e) {
 		sceneObjects = scene.children.filter(child => child.name === "Scene" || child.name === "cubetest");
+
+		console.log(sceneObjects[1].position)
 
 		if (cvBook !== null && e.keyCode === 13) {
 	  
@@ -357,10 +368,13 @@ const tick = () => {
 						// console.log(obj)
 						// Define new x position for each obj
 						obj.position.x = posXs[index]; 
+						// camera.position.set((posXs - 0.5), 1, 1);
 					})
 				}
-				camera.position.set((cvBook.position.x - 0.5), 1, 1);
+				
 				controls.target.set((cvBook.position.x - 0.5), 1, - 1.8);
+				camera.position.set((cvBook.position.x - 0.5), 1, 1);
+
 
 				requestAnimationFrame(updatePosition);
 			}
@@ -377,27 +391,41 @@ const tick = () => {
 	const cubeBox = new THREE.Box3().setFromObject(cube);
 	const cubeTestBox = new THREE.Box3().setFromObject(cubeTest);
 
-	if (cubeTestBox.intersectsBox(cubeBox)) {
-		console.log("touché")
-		run.stop()
-		// previousTime = elapsedTime;
-		sceneObjects.splice(1, 1);
+	console.log(enterPressed)
 
-		console.log(sceneObjects[1])
+	if(enterPressed == true){
+		if (cubeTestBox.intersectsBox(cubeBox)) {
+			if (cubeTestBox.max.y >= cubeBox.min.y && cubeTestBox.min.y <= cubeBox.max.y) {
+				console.log("touché y");
+				sceneObjects[2].position.y = cubeBox.max.y
+				if(!cubeTestBox.max.y >= cubeBox.min.y && !cubeTestBox.min.y <= cubeBox.max.y && sceneObjects[2].position.y !== 0.5){
+					console.log("plus touché y");
+					sceneObjects[2].position.y = 0.5;
+				}
+			} else {
+				console.log("touché")
+				run.stop()
+				previousTime = elapsedTime;
+				sceneObjects.splice(2, 1);
+				console.log(sceneObjects)
+			} 
+			stay.play()
+			// updatePosition().remove()
+			// sceneObjects[1].clipAction(sceneObjects[1].animations[2])
+		} else {
+			console.log("touche pas")
+			// if(sceneObjects){
+				// if(sceneObjects[2].position.y !== 0){
+					// Problème ici pour le saut 
+					sceneObjects[2].position.y = 0
+				// }
+			// }
+		}
+	}
+		
 
-		console.log(previousTime)
-		// console.log("//////////////////////////")
-		// console.log(sceneObjects[1])	
-		// console.log("****************")
-		// console.log(sceneObjects[1].children)
-		// console.log("//////////////////////////")
-		// mixerPaul = new THREE.AnimationMixer(sceneObjects[1])
-		// const stay = mixerPaul.clipAction(sceneObjects[1].animations[2])
-		// console.log(stay)
-		stay.play()
-		// updatePosition().remove()
-		// sceneObjects[1].clipAction(sceneObjects[1].animations[2])
-	} 
+
+	
 
     // Update controls
     controls.update()
