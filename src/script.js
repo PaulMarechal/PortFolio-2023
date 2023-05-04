@@ -406,6 +406,8 @@ const tick = () => {
 					console.log("plus touché y");
 					sceneObjects[2].position.y = 0.5;
 				}
+			} else if(cubeTestBox.max.x >= cubeBox.min.x && cubeTestBox.min.x <= cubeBox.max.x) {
+				// Si avatar touche le cube sur l'axe des X bloque le déplacement 
 			} else {
 				console.log("touché")
 				run.stop()
