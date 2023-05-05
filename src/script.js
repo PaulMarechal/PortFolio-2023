@@ -229,35 +229,26 @@ loader.load(
 			} else if (enterPressed && e.keyCode === 32) { 
 
 				function updateJump(){
-					console.log("ici")
 					run.stop();
 					jump.play();
 					const startTime = clock.getElapsedTime();
 					const jumpDuration = 0.9; // Jump time in second
 					function animateJump() {
-						// console.log("la")
 					  	const timeElapsed = clock.getElapsedTime() - startTime;
-						console.log(`start time : ${startTime}`)
-						console.log(`timeElapsed : ${timeElapsed}`)
 						isJump = true;
 
 						const jumpHeight = Math.max(0, Math.sin(timeElapsed / jumpDuration * Math.PI) * 1.3);
 						gltf.scene.position.y = jumpHeight;
-					  	// cubeTest.position.y = jumpHeight + 1
+					  	cubeTest.position.y = jumpHeight + 1
 	
 					 	if (timeElapsed >= jumpDuration) {
-							console.log("et la")
 							jump.stop();
 							run.play();
 							isJump = false
 							return;
 					  	}
-						// console.log("et encore la")
-		
-
 					 	requestAnimationFrame(animateJump);
 					}
-					// console.log("ici")
 					animateJump();
 				}
 				updateJump();
@@ -400,34 +391,23 @@ const tick = () => {
 	if(enterPressed == true){
 		if (cubeTestBox.intersectsBox(cubeBox)) {
 			if (cubeTestBox.max.y >= cubeBox.min.y && cubeTestBox.min.y <= cubeBox.max.y) {
-				console.log("touché y");
 				sceneObjects[2].position.y = cubeBox.max.y
 				if(!cubeTestBox.max.y >= cubeBox.min.y && !cubeTestBox.min.y <= cubeBox.max.y && sceneObjects[2].position.y !== 0.5){
-					console.log("plus touché y");
 					sceneObjects[2].position.y = 0.5;
 				}
 			} else if(cubeTestBox.max.x >= cubeBox.min.x && cubeTestBox.min.x <= cubeBox.max.x) {
 				// Si avatar touche le cube sur l'axe des X bloque le déplacement 
 			} else {
-				console.log("touché")
 				run.stop()
 				previousTime = elapsedTime;
 				sceneObjects.splice(2, 1);
 				console.log(sceneObjects)
 			} 
 			stay.play()
-			// updatePosition().remove()
-			// sceneObjects[1].clipAction(sceneObjects[1].animations[2])
 		} else {
-			console.log("touche pas")
-			// if(sceneObjects){
-				if(!isJump){
-					sceneObjects[2].position.y = 0
-				}
-				// if(sceneObjects[2].position.y !== 0){
-					// Problème ici pour le saut 
-				// }
-			// }
+			if(!isJump){
+				sceneObjects[2].position.y = 0
+			}	
 		}
 	}
 		
