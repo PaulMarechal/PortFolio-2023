@@ -339,6 +339,7 @@ const tick = () => {
 			let rotationY = 0;
 			let posXs = sceneObjects.map(obj => obj.position.x); 
 			let camPos = 5
+			let stopMovement = false;
 
 			function updatePosition() {
 				if (cvBook.position.y >= 0.4950) {
@@ -354,17 +355,22 @@ const tick = () => {
 						obj.rotation.y = Math.min(rotationY * 1.55, 1.55);
 					});
 				} else {
-					// maj all X position
-					posXs = posXs.map(posX => posX + 0.03); 
-					// console.log(posXs);
-					// console.log(cubeTest)
-					// cubeTest.position.x = cvBook.position.x - 1
-					sceneObjects.forEach((obj, index) => {
-						// console.log(obj)
-						// Define new x position for each obj
-						obj.position.x = posXs[index]; 
-						// camera.position.set((posXs - 0.5), 1, 1);
-					})
+					if (cubeTestBox.max.x >= cubeBox.min.x && cubeTestBox.min.x <= cubeBox.max.x) {
+						stopMovement = true;
+						
+						// Si avatar touche le cube sur l'axe des X bloque le déplacement
+					} else if(!stopMovement) {
+						posXs = posXs.map(posX => posX + 0.03); 
+						// console.log(posXs);
+						// console.log(cubeTest)
+						// cubeTest.position.x = cvBook.position.x - 1
+						sceneObjects.forEach((obj, index) => {
+							// console.log(obj)
+							// Define new x position for each obj
+							obj.position.x = posXs[index]; 
+							// camera.position.set((posXs - 0.5), 1, 1);
+						})
+					}
 				}
 				
 				controls.target.set((cvBook.position.x - 0.5), 1, - 1.8);
@@ -386,29 +392,28 @@ const tick = () => {
 	const cubeBox = new THREE.Box3().setFromObject(cube);
 	const cubeTestBox = new THREE.Box3().setFromObject(cubeTest);
 
-	console.log(enterPressed)
-
 	if(enterPressed == true){
 		if (cubeTestBox.intersectsBox(cubeBox)) {
 			if (cubeTestBox.max.y >= cubeBox.min.y && cubeTestBox.min.y <= cubeBox.max.y) {
-				sceneObjects[2].position.y = cubeBox.max.y
-				if(!cubeTestBox.max.y >= cubeBox.min.y && !cubeTestBox.min.y <= cubeBox.max.y && sceneObjects[2].position.y !== 0.5){
+				sceneObjects[2].position.y = cubeBox.max.y;
+				if (!cubeTestBox.max.y >= cubeBox.min.y && !cubeTestBox.min.y <= cubeBox.max.y && sceneObjects[2].position.y !== 0.5) {
 					sceneObjects[2].position.y = 0.5;
 				}
-			} else if(cubeTestBox.max.x >= cubeBox.min.x && cubeTestBox.min.x <= cubeBox.max.x) {
+			} if (cubeTestBox.max.x >= cubeBox.min.x && cubeTestBox.min.x <= cubeBox.max.x) {
+				run.stop();
 				// Si avatar touche le cube sur l'axe des X bloque le déplacement 
 			} else {
-				run.stop()
 				previousTime = elapsedTime;
 				sceneObjects.splice(2, 1);
-				console.log(sceneObjects)
+				run.stop();
 			} 
-			stay.play()
+			stay.play();
 		} else {
-			if(!isJump){
-				sceneObjects[2].position.y = 0
+			if (!isJump) {
+				sceneObjects[2].position.y = 0;
 			}	
 		}
+		
 	}
 		
 
