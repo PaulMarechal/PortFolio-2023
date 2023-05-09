@@ -321,6 +321,8 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 const clock = new THREE.Clock()
 let previousTime = 0
 let sceneObjects = null
+let gltfXPosition = 0
+
 
 const tick = () => {
     const elapsedTime = clock.getElapsedTime()
@@ -332,7 +334,7 @@ const tick = () => {
 	function handleKeyPress(e) {
 		sceneObjects = scene.children.filter(child => child.name === "Scene" || child.name === "cubetest");
 
-		console.log(sceneObjects[1].position)
+		// console.log(sceneObjects[1].position)
 
 		if (cvBook !== null && e.keyCode === 13) {
 	  
@@ -355,8 +357,15 @@ const tick = () => {
 						obj.rotation.y = Math.min(rotationY * 1.55, 1.55);
 					});
 				} else {
+					
 					if (cubeTestBox.max.x >= cubeBox.min.x && cubeTestBox.min.x <= cubeBox.max.x) {
+						// console.log("yo touché")
 						stopMovement = true;
+
+						// return
+						//run.stop();
+						// Ajouter ça dans la boucle Tick ( stopMovement)
+
 						
 						// Si avatar touche le cube sur l'axe des X bloque le déplacement
 					} else if(!stopMovement) {
@@ -367,15 +376,30 @@ const tick = () => {
 						sceneObjects.forEach((obj, index) => {
 							// console.log(obj)
 							// Define new x position for each obj
+							
 							obj.position.x = posXs[index]; 
 							// camera.position.set((posXs - 0.5), 1, 1);
+
+							
+							/*
+							if(gltfXPosition != 0){
+								// sceneObjects[1].position.x = gltfXPosition
+								return
+							}
+							*/
+							
 						})
+						
+						if(gltfXPosition != 0){
+							sceneObjects[2].position.x = gltfXPosition
+							
+						}
+						
 					}
 				}
 				
 				controls.target.set((cvBook.position.x - 0.5), 1, - 1.8);
 				camera.position.set((cvBook.position.x - 0.5), 1, 1);
-
 
 				requestAnimationFrame(updatePosition);
 			}
@@ -401,12 +425,26 @@ const tick = () => {
 				}
 			} if (cubeTestBox.max.x >= cubeBox.min.x && cubeTestBox.min.x <= cubeBox.max.x) {
 				run.stop();
+				stay.play();
+
+				
+				gltfXPosition = sceneObjects[2].position.x
+					
+				
+				
+				// console.log(sceneObjects[2].position.x)
 				// Si avatar touche le cube sur l'axe des X bloque le déplacement 
 			} else {
 				previousTime = elapsedTime;
 				sceneObjects.splice(2, 1);
+				gltfXPosition = sceneObjects[2].position.x
 				run.stop();
+
+				if(gltfXPosition > 0){
+					sceneObjects[2].position.x = gltfXPosition
+				}
 			} 
+
 			stay.play();
 		} else {
 			if (!isJump) {
@@ -417,7 +455,7 @@ const tick = () => {
 	}
 		
 
-
+	console.log(gltfXPosition)
 	
 
     // Update controls
