@@ -453,7 +453,6 @@ const tick = () => {
 		}
 		
 	}
-		
 
 	console.log(gltfXPosition)
 	
