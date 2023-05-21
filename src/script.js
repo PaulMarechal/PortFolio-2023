@@ -426,11 +426,9 @@ const tick = () => {
 			} if (cubeTestBox.max.x >= cubeBox.min.x && cubeTestBox.min.x <= cubeBox.max.x) {
 				run.stop();
 				stay.play();
-
 				
-				gltfXPosition = sceneObjects[2].position.x
-					
-				
+				gltfXPosition = sceneObjects[2].position.x  
+				console.log(gltfXPosition)
 				
 				// console.log(sceneObjects[2].position.x)
 				// Si avatar touche le cube sur l'axe des X bloque le déplacement 

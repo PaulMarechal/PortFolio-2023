@@ -1,4 +1,15 @@
 export function customCursor(){
+
+    function createLinkTween(src, key){
+        const tweenLiteLink = document.createElement("script")
+        tweenLiteLink.src = src
+        tweenLiteLink.setAttribute("integrity", key)
+        tweenLiteLink.setAttribute("crossorigin", "anonymous")
+    }
+
+    createLinkTween("https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js", "sha512-DkPsH9LzNzZaZjCszwKrooKwgjArJDiEjA5tTgr3YX4E6TYv93ICS8T41yFHJnnSmGpnf0Mvb5NhScYbwvhn2w==")
+    createLinkTween("https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TimelineMax.min.js", "sha512-0xrMWUXzEAc+VY7k48pWd5YT6ig03p4KARKxs4Bqxb9atrcn2fV41fWs+YXTKb8lD2sbPAmZMjKENiyzM/Gagw==")
+
     document.addEventListener("DOMContentLoaded", function(event) {
         if(document.querySelector(".custom-cursor")){
             var cursor = document.querySelector(".custom-cursor");
