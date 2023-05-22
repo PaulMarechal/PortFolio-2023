@@ -68,6 +68,7 @@ document.getElementById('header').innerHTML = `
         </ul>  
     </nav>
 `
+
 const checkbox = document.getElementById("burger")
 const menu = document.getElementById("menu")
 const linkMenuHome = document.getElementById("linkMenuHome")
