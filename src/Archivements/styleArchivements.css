@@ -246,7 +246,7 @@ body .options {
   /* min-width: 60%; */
   max-width: 90%;
   /* max-width: 90%; */
-  width: calc(100% - 28%);
+  width: calc(100% - 10%);
   height: 400px;
   /* height: 56%; */
 }
@@ -376,6 +376,7 @@ body .options .option .label .icon {
   background-color: white;
   color: var(--defaultBackground);
 }
+
 body .options .option .label .info {
   display: flex;
   flex-direction: column;
